@@ -1,0 +1,41 @@
+/* ===== Global Breadcrumb ===== */
+
+.breadcrumb {
+    font-size: 15px;
+    margin-top: 30px;
+    margin-bottom: 40px;
+    color: #777;
+}
+
+.breadcrumb .separator {
+    margin: 0 8px;
+    color: #999;
+}
+
+.breadcrumb .active {
+    color: #F26A21;
+    font-weight: 600;
+}
+
+.breadcrumb .breadcrumbLink {
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+}
+
+.breadcrumb .breadcrumbLink:hover {
+    color: #F26A21;
+}
+
+.page {
+    padding-top: 120px;
+    padding-bottom: 80px;
+}
+
+@media (max-width: 992px) {
+    .page {
+        padding-top: 60px;
+        padding-bottom: 50px;
+    }
+}

@@ -1,0 +1,110 @@
+.page {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    background: #fafafa;
+}
+
+.contactContainer {
+    max-width: 1400px;
+    margin: auto;
+    padding: 0 50px;
+}
+
+/* ===== Contact Box ===== */
+
+.contactBox {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+}
+
+/* ===== Left Side ===== */
+
+.contactLeft {
+    padding: 40px 50px;
+}
+
+.contactLeft h1 {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #111;
+}
+
+.companyName {
+    font-size: 30px;
+    margin-bottom: 30px;
+    color: #F26A21;
+    font-weight: 700;
+}
+
+.infoItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.infoIcon {
+    color: #F26A21;
+    font-size: 20px;
+    min-width: 22px;
+}
+
+.infoItem a {
+    text-decoration: none;
+    color: #333;
+}
+
+.infoItem a:hover {
+    color: #F26A21;
+}
+
+/* ===== Map ===== */
+
+.contactRight {
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contactRight iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 12px;
+    border: 1px solid #F26A21;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Mobile ===== */
+
+
+@media (max-width: 992px) {
+    .contactContainer {
+        padding: 0 20px;
+    }
+
+    .contactBox {
+        grid-template-columns: 1fr;
+    }
+
+    .contactLeft {
+        padding: 30px 25px;
+    }
+
+    .contactRight iframe {
+        height: 300px;
+    }
+
+    .contactLeft h1 {
+        font-size: 22px;
+    }
+
+    .companyName {
+        font-size: 20px;
+    }
+}

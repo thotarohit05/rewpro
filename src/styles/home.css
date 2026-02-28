@@ -1,0 +1,81 @@
+/* ================= HOME ================= */
+.home {
+    padding-top: 110px;
+}
+
+/* ================= HERO ================= */
+.heroSection {
+    height: 85vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.55)),
+        url("../assets/dealer.png");
+    background-size: cover;
+    background-position: left center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px;
+    color: #fff;
+}
+
+.heroContent h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.heroContent span {
+    color: #F26A21;
+}
+
+.heroContent p {
+    max-width: 700px;
+    margin: auto;
+    font-size: 18px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.heroButtons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.heroButtons button {
+    padding: 12px 30px;
+    background: #F26A21;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.heroButtons button:hover {
+    background: #d35400;
+}
+
+.outlineBtn {
+    background: transparent !important;
+    border: 2px solid #fff !important;
+}
+
+@media (max-width: 768px) {
+    .heroContent h1 {
+        font-size: 28px;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 992px) {
+    .home {
+        padding-top: 73px;
+    }
+}

@@ -1,0 +1,180 @@
+/* PAGE */
+.servicePage {
+  background: #f8f9fa;
+}
+
+.serviceContainer {
+  max-width: 1300px;
+  margin: auto;
+}
+
+/* WRAPPER */
+.serviceWrapper {
+  display: flex;
+  gap: 20px;
+}
+/* RIGHT SIDE */
+.serviceRight {
+  flex: 1;
+  display: flex;
+  align-items: flex-start; 
+  padding-top: 180px;
+}
+
+.serviceRight img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+}
+/* LEFT SIDE */
+.serviceLeft {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.serviceLeft h1 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.serviceSubtitle {
+  margin-bottom: 25px;
+  color: #555;
+}
+
+/* FORM */
+.bookingForm {
+  background: #fff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* TOGGLE */
+.toggleWrapper {
+  display: flex;
+  background: #f2f2f2;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.3s;
+  color: #555;
+}
+
+.toggleBtn.active {
+  background: #F26A21;
+  color: #fff;
+}
+
+/* INPUTS */
+.bookingForm input,
+.bookingForm textarea,
+.bookingForm select {
+  width: 100%;
+  padding: 10px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+.bookingForm input:focus,
+.bookingForm textarea:focus,
+.bookingForm select:focus {
+  border-color: #F26A21;
+  box-shadow: 0 0 0 3px rgba(242,106,33,0.15);
+}
+
+/* SELECT */
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.selectWrapper select {
+  width: 100%;
+  padding: 14px 45px 14px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  appearance: none;
+  background: #fff;
+  cursor: pointer;
+}
+
+.selectIcon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  color: #F26A21;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.selectIcon.rotate {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* BUTTON */
+.bookingForm button[type="submit"] {
+  background: #F26A21;
+  color: #fff;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bookingForm button[type="submit"]:hover {
+  background: #d95c18;
+}
+
+/* GENUINE NOTE */
+.genuineNote {
+  margin-top: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+  background: rgba(242,106,33,0.08);
+  padding: 14px 18px;
+  border-left: 4px solid #F26A21;
+  border-radius: 6px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .serviceWrapper {
+    flex-direction: column;
+  }
+
+  .serviceRight {
+    padding-top: 0;
+  }
+
+  .serviceRight img {
+    height: auto;
+  }
+
+  .serviceContainer {
+    padding: 0 20px;
+  }
+}

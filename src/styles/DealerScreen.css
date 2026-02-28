@@ -1,0 +1,274 @@
+/* ================= DEALER SCREEN ================= */
+.banner {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  padding-left: 6%;
+  color: #fff;
+}
+
+.banner h1 {
+  font-size: 26px;
+  font-weight: 700;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ================= FORM CARD ================= */
+.formCard {
+  background: #ffffff;
+  margin: -90px auto 60px;
+  width: 85%;
+  border-radius: 26px;
+  padding: 40px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= GRID ================= */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  color: #ff6a00;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+/* ================= INPUTS ================= */
+.field input,
+.field select {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  background: #fff;
+  color: #333;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: #ff6a00;
+}
+
+::placeholder {
+  color: #999;
+  font-size: 13px;
+}
+
+/* ===== Remove Chrome Autofill Blue ===== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #333 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ================= SELECT ================= */
+.field select {
+  cursor: pointer;
+  color: #999;
+}
+
+/* Dropdown options color */
+.field select option {
+  color: #000;
+  /* black text inside dropdown */
+  background: #fff;
+}
+
+.field select.hasValue {
+  color: #333;
+}
+
+.field select:disabled {
+  background: #f5f5f5;
+  color: #aaa;
+}
+
+/* ================= ERRORS ================= */
+.inputError {
+  border: 2px solid red !important;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ================= CAPTCHA ================= */
+.captchaRow {
+  margin-top: 30px;
+}
+
+.captchaRow label {
+  color: #ff6a00;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.captchaBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.captchaBox input {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+}
+
+.captchaBox span {
+  font-weight: 700;
+  color: #ff6a00;
+  white-space: nowrap;
+}
+
+/* Refresh button */
+.captchaRefreshBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(255, 122, 24, 0.45);
+}
+
+.captchaRefreshBtn:hover {
+  transform: scale(1.05);
+}
+
+.captchaRefreshBtn svg {
+  transition: transform 0.4s ease;
+}
+
+.captchaRefreshBtn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* ================= SUBMIT ================= */
+.submitBtn {
+  margin-top: 32px;
+  background: linear-gradient(135deg, #ff6a00, #ff8c1a);
+  color: #fff;
+  padding: 12px 42px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 106, 0, 0.35);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ================= LOADER OVERLAY ================= */
+.submitOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: #fff;
+}
+
+.submitLoader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #ddd;
+  border-top: 6px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .formGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .formCard {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 520px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .banner {
+    height: 220px;
+    background-position: 0%;
+  }
+
+  .banner h1 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 520px) {
+
+  .captchaBox {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .captchaBox input {
+    width: 100%;
+  }
+
+  .captchaBox span {
+    flex: unset;
+    /* IMPORTANT */
+  }
+
+  .captchaRefreshBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+}

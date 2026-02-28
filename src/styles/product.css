@@ -1,0 +1,144 @@
+.productPage {
+    padding: 120px 8%;
+    background: #f9f9f9;
+}
+
+/* PAGE HEADER */
+.pageHeader {
+    text-align: center;
+    margin-bottom: 70px;
+}
+
+.pageHeader h1 {
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.pageHeader p {
+    color: #F26A21;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+/* SECTION HEADER */
+
+.sectionHeader {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.sectionHeader h2 {
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.sectionHeader p {
+    color: #F26A21;
+    font-weight: 500;
+}
+
+/* DEALER SECTION DIFFERENT COLOR */
+.dealerHeader p {
+    color: #555;
+}
+
+/* GRID */
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+/* CARD */
+.productCard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transition: 0.3s ease;
+}
+
+.productCard:hover {
+    transform: translateY(-6px);
+}
+
+/* BADGES */
+.badge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 14px;
+    background: #F26A21;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.dealerBadge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 14px;
+    background: #444;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+/* IMAGE WRAPPER */
+.imageWrapper {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.imageWrapper img {
+    max-width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    transition: 0.3s ease;
+}
+
+.productCard:hover img {
+    transform: scale(1.05);
+}
+/* ========================= */
+/* MOBILE SCREEN FIX */
+/* ========================= */
+
+@media (max-width: 576px) {
+
+  .productPage {
+    padding: 80px 20px;   /* proper side gap */
+  }
+
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);  /* 2 products per row */
+    gap: 15px;
+  }
+
+  .productCard {
+    padding: 18px;
+  }
+
+  .productCard h3 {
+    font-size: 14px;
+  }
+
+  .imageWrapper {
+    height: 130px;
+  }
+
+  .imageWrapper img {
+    max-height: 110px;
+  }
+
+  .badge,
+  .dealerBadge {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+}
