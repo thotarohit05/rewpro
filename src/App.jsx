@@ -15,11 +15,17 @@ import Product from "./pages/Product";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import { useEffect } from "react";
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  useEffect(() => {
+    window.history.scrollRestoration = "manual";
+  }, []);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   return (
     <>
       {!isAdminRoute && <Header />}

@@ -20,24 +20,21 @@ export default function Footer() {
         </div>
 
         <div className="footer-right">
+          <FiSettings
+            size={18}
+            className="admin-settings-icon"
+            onClick={handleAdminAccess}
+          />
           <span>
             Designed & Developed by <strong>Mr. Rohit</strong>
           </span>
-
-          {/* Settings Icon */}
-          <FiSettings
-  size={18}
-  className="admin-settings-icon"
-  onClick={handleAdminAccess}
-/>
-
           <a
             href="https://wa.me/919182425192?text=Hello%20I%20need%20development%20support"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
           >
-            <FaWhatsapp size={16} />
+            <FaWhatsapp size={18} />
             DM for developments
           </a>
         </div>
