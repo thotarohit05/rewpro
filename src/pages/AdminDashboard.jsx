@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { FaUsers, FaPowerOff } from "react-icons/fa";
+import { RiExpandDiagonalSLine } from "react-icons/ri";
+import { IoIosCloseCircle } from "react-icons/io";
 import { TiExport } from "react-icons/ti";
 import { CgTrash } from "react-icons/cg";
+import { MdRestore } from "react-icons/md";
+import { IoIosArrowDropdown } from "react-icons/io";
+import { TbLayoutSidebarLeftExpand, TbLayoutSidebarRightExpand } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,24 +16,30 @@ import "../styles/admin.css";
 const PAGE_SIZE = 5;
 const HIDDEN_COLUMNS = ["id", "is_deleted", "created_at"];
 
+const tableMap = {
+  dealer: "dealer_requests",
+  distributor: "distributor_requests",
+  service: "service_bookings",
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("dealer");
+  const [trashOpen, setTrashOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [lastLogin, setLastLogin] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
 
-  const getTableName = () =>
-    activeTab === "dealer"
-      ? "dealer_requests"
-      : activeTab === "distributor"
-      ? "distributor_requests"
-      : "service_bookings";
+  const isTrash = activeTab.startsWith("trash-");
+  const baseTab = activeTab.replace("trash-", "");
+  const tableName = tableMap[baseTab];
+  // const [expandTable, setExpandTable] = useState(false);
+  const [tableOnly, setTableOnly] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -47,15 +58,14 @@ const AdminDashboard = () => {
     const to = from + PAGE_SIZE - 1;
 
     const { data, count, error } = await supabase
-      .from(getTableName())
+      .from(tableName)
       .select("*", { count: "exact" })
-      .eq("is_deleted", false)
+      .eq("is_deleted", isTrash)
       .order("created_at", { ascending: false })
       .range(from, to);
 
-    if (error) {
-      toast.error("Failed to fetch data ❌");
-    } else {
+    if (error) toast.error("Failed to fetch ❌");
+    else {
       setData(data || []);
       setTotalCount(count || 0);
     }
@@ -63,31 +73,26 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
-  const confirmDelete = (id) => {
-    setDeleteId(id);
-    setShowPopup(true);
+  const softDelete = async (id) => {
+    await supabase.from(tableName).update({ is_deleted: true }).eq("id", id);
+    toast.success("Moved to Trash 🗑️");
+    fetchData();
   };
 
-  const softDelete = async () => {
-    const { error } = await supabase
-      .from(getTableName())
-      .update({ is_deleted: true })
-      .eq("id", deleteId);
+  const restoreItem = async (id) => {
+    await supabase.from(tableName).update({ is_deleted: false }).eq("id", id);
+    toast.success("Restored ✅");
+    fetchData();
+  };
 
-    if (error) {
-      toast.error("Delete failed ❌");
-    } else {
-      setData((prev) => prev.filter((item) => item.id !== deleteId));
-      setTotalCount((prev) => prev - 1);
-      toast.success("Successfully deleted ✅");
-    }
-
-    setShowPopup(false);
-    setDeleteId(null);
+  const permanentDelete = async (id) => {
+    await supabase.from(tableName).delete().eq("id", id);
+    toast.success("Deleted permanently 🚀");
+    fetchData();
   };
 
   const exportData = () => {
-    if (!data.length) return toast.error("No data to export ❌");
+    if (!data.length) return toast.error("No data ❌");
 
     const headers = Object.keys(data[0]).filter(
       (key) => !HIDDEN_COLUMNS.includes(key)
@@ -106,62 +111,135 @@ const AdminDashboard = () => {
     link.download = `${activeTab}-page-${page}.csv`;
     link.click();
 
-    toast.success("Exported successfully ✅");
+    toast.success("Exported ✅");
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success("Logged out successfully 👋");
     navigate("/admin-login", { replace: true });
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <div className="adminLayout">
-      <div className="sidebar">
-        <h3>REW</h3>
+    <div className={`adminLayout ${tableOnly ? "tableOnlyMode" : ""}`}>
+      {/* Mobile Open Button */}
+      {!mobileOpen && (
+        <button
+          className="mobileOpenBtn"
+          onClick={() => setMobileOpen(true)}
+        >
+          <TbLayoutSidebarLeftExpand size={22} />
+        </button>
+      )}
+      {mobileOpen && (
+        <div
+          className="sidebarBackdrop"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-        {["dealer", "distributor", "service"].map((tab) => (
+      {/* Sidebar */}
+      <div className={`sidebar ${mobileOpen ? "show" : ""}`}>
+        <div className="sidebarHeader">
+          <h3 className="logoText">REW</h3>
+
+          {mobileOpen && (
+            <button
+              className="insideToggleBtn"
+              onClick={() => setMobileOpen(false)}
+            >
+              <TbLayoutSidebarRightExpand size={20} />
+            </button>
+          )}
+        </div>
+
+        {Object.keys(tableMap).map((tab) => (
           <button
             key={tab}
             className={activeTab === tab ? "active" : ""}
             onClick={() => {
               setActiveTab(tab);
               setPage(1);
+              setTrashOpen(false);
+              setMobileOpen(false);
             }}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
 
-        <button className="logout" onClick={handleLogout}>
-          <FaPowerOff className="logoutIcon" />
-          Logout
-        </button>
-      </div>
+        <div className="trashSection">
+          <button
+            className={`sidebarItem trashBtn ${trashOpen ? "open" : ""}`}
+            onClick={() => setTrashOpen(!trashOpen)}
+          >
+            <span>Trash</span>
+            <IoIosArrowDropdown className="arrowIcon" />
+          </button>
 
-      <div className="content">
-        <div className="topBar">
-          <p>
-            Last Login:{" "}
-            {lastLogin && new Date(lastLogin).toLocaleString()}
-          </p>
-        </div>
-
-        <div className="countCard">
-          <FaUsers size={22} />
-          <div>
-            <h3>Total Records</h3>
-            <p>{totalCount}</p>
+          <div className={`trashDropdown ${trashOpen ? "show" : ""}`}>
+            {Object.keys(tableMap).map((tab) => (
+              <button
+                key={tab}
+                className={activeTab === `trash-${tab}` ? "activeSub" : ""}
+                onClick={() => {
+                  setActiveTab(`trash-${tab}`);
+                  setPage(1);
+                  setMobileOpen(false);
+                }}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
 
-        <button className="exportBtn" onClick={exportData}>
-          <TiExport /> Export
+        <button className="logout" onClick={handleLogout}>
+          <FaPowerOff /> Logout
         </button>
+      </div>
 
+      {/* CONTENT */}
+      <div className="content">
+        {!tableOnly && (
+          <>
+            <div className="topBar">
+              {lastLogin && (
+                <p>Last Login: {new Date(lastLogin).toLocaleString()}</p>
+              )}
+            </div>
+
+            <div className="countCard">
+              <FaUsers size={22} />
+              <div>
+                <h3>Total Records</h3>
+                <p>{totalCount}</p>
+              </div>
+            </div>
+
+            <div className="topActions">
+
+              <button className="exportBtn" onClick={exportData}>
+                <TiExport /> Export
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* TABLE */}
         <div className="tableWrapper">
+          {/* MOBILE EXPAND BUTTON - ATTACHED TO TABLE */}
+          <button
+            className="mobileExpandBtn"
+            onClick={() => setTableOnly(!tableOnly)}
+          >
+            {tableOnly ? (
+              <IoIosCloseCircle size={20} />
+            ) : (
+              <RiExpandDiagonalSLine size={18} />
+            )}
+          </button>
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -171,10 +249,10 @@ const AdminDashboard = () => {
                   <th>SR. NO</th>
                   {data[0] &&
                     Object.keys(data[0])
-                      .filter((key) => !HIDDEN_COLUMNS.includes(key))
-                      .map((key) => (
-                        <th key={key}>
-                          {key.replace(/_/g, " ").toUpperCase()}
+                      .filter((k) => !HIDDEN_COLUMNS.includes(k))
+                      .map((k) => (
+                        <th key={k}>
+                          {k.replace(/_/g, " ").toUpperCase()}
                         </th>
                       ))}
                   <th>ACTION</th>
@@ -192,15 +270,38 @@ const AdminDashboard = () => {
                       <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
 
                       {Object.keys(row)
-                        .filter((key) => !HIDDEN_COLUMNS.includes(key))
-                        .map((key) => (
-                          <td key={key}>{row[key]?.toString()}</td>
+                        .filter((k) => !HIDDEN_COLUMNS.includes(k))
+                        .map((k) => (
+                          <td key={k}>{row[k]?.toString()}</td>
                         ))}
 
                       <td>
-                        <button onClick={() => confirmDelete(row.id)}>
-                          <CgTrash size={18} />
-                        </button>
+                        <div className="actionButtons">
+                          {isTrash ? (
+                            <>
+                              <button
+                                className="iconBtn restoreBtnIcon"
+                                onClick={() => restoreItem(row.id)}
+                              >
+                                <MdRestore size={18} />
+                              </button>
+
+                              <button
+                                className="iconBtn deleteBtnIcon"
+                                onClick={() => permanentDelete(row.id)}
+                              >
+                                <CgTrash size={18} />
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              className="iconBtn deleteBtnIcon"
+                              onClick={() => softDelete(row.id)}
+                            >
+                              <CgTrash size={18} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -210,46 +311,25 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        <div className="pagination">
-          <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-            Prev
-          </button>
-
-          <span>
-            Page {page} of {totalPages || 1}
-          </span>
-
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-          </button>
-        </div>
+        {!tableOnly && (
+          <div className="pagination">
+            <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+              Prev
+            </button>
+            <span>
+              Page {page} of {totalPages || 1}
+            </span>
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
-      {showPopup && (
-        <div className="modalOverlay">
-          <div className="modalBox">
-            <h3>Confirm Delete</h3>
-            <p>Are you sure you want to delete this record?</p>
-
-            <div className="modalActions">
-              <button
-                onClick={() => setShowPopup(false)}
-                className="cancelBtn"
-              >
-                No
-              </button>
-              <button onClick={softDelete} className="deleteBtn">
-                Yes, Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

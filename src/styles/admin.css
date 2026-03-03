@@ -6,7 +6,7 @@
   display: flex;
   min-height: 100vh;
   font-family: "Inter", sans-serif;
-  background: #f7f7f8;
+  background: #f8fafc;
   color: #111827;
 }
 
@@ -16,19 +16,44 @@
 
 .sidebar {
   width: 240px;
-  background: #f9f9fb;
+  background: #ffffff;
   border-right: 1px solid #e5e7eb;
   padding: 20px 15px;
   display: flex;
   flex-direction: column;
+  transition: width 0.3s ease;
+  position: relative;
 }
 
-.sidebar h3 {
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.sidebarBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.logoText {
+  margin: 0;
   font-size: 20px;
   font-weight: 800;
-  margin-bottom: 30px;
 }
 
+.insideToggleBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* Sidebar Buttons */
 .sidebar button {
   background: transparent;
   border: none;
@@ -38,19 +63,97 @@
   margin-bottom: 6px;
   border-radius: 8px;
   font-size: 14px;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .sidebar button:hover {
-  background: #ececf1;
+  background: #f3f4f6;
 }
 
 .sidebar .active {
-  background: #e5e7eb;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.sidebar.collapsed button span {
+  display: none;
+}
+
+/* =========================
+   TRASH DROPDOWN
+========================= */
+
+.trashSection {
+  margin-top: 5px;
+}
+
+.sidebarItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.trashBtn {
   font-weight: 500;
 }
 
-/* Logout */
+.arrowIcon {
+  transition: transform 0.3s ease;
+}
+
+.trashBtn.open .arrowIcon {
+  transform: rotate(180deg);
+}
+
+.trashDropdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}
+
+.trashDropdown.show {
+  max-height: 250px;
+}
+
+.trashDropdown button {
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-top: 4px;
+  transition: 0.2s;
+}
+
+.trashDropdown button:hover {
+  background: #f1f5f9;
+}
+
+.activeSub {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+  border-left: 3px solid #0284c7;
+}
+
+.sidebar.collapsed .trashDropdown {
+  display: none;
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
 .logout {
   margin-top: auto;
   display: flex;
@@ -60,8 +163,8 @@
   font-size: 14px;
 }
 
-.logoutIcon {
-  font-size: 16px;
+.logout:hover {
+  background: #fee2e2;
 }
 
 /* =========================
@@ -71,6 +174,7 @@
 .content {
   flex: 1;
   padding: 30px;
+  min-width: 0;
 }
 
 .topBar {
@@ -101,8 +205,8 @@
 ========================= */
 
 .exportBtn {
-  background: #111827;
-  color: white;
+  background: #e0f2fe;
+  color: #0369a1;
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
@@ -111,10 +215,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-}
-
-.exportBtn:hover {
-  background: #000;
+  transition: 0.2s ease;
 }
 
 /* =========================
@@ -151,22 +252,44 @@ tr:hover {
   background: #f9fafb;
 }
 
-/* Delete button */
-td button {
-  width: 36px;
-  height: 36px;
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   border: none;
-  background: #fee2e2;
-  color: #ef4444;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
-td button:hover {
+.deleteBtnIcon {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.deleteBtnIcon:hover {
   background: #fecaca;
+}
+
+.restoreBtnIcon {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.restoreBtnIcon:hover {
+  background: #a7f3d0;
 }
 
 /* =========================
@@ -188,6 +311,7 @@ td button:hover {
   border: 1px solid #e5e7eb;
   background: white;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .pagination button:hover:not(:disabled) {
@@ -200,77 +324,55 @@ td button:hover {
   cursor: not-allowed;
 }
 
+.mobileOpenBtn {
+  display: none;
+}
 /* =========================
-   MODAL
+   TABLE FULLSCREEN MODE
 ========================= */
 
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+.tableOnlyMode .sidebar {
+  display: none;
 }
 
-.modalBox {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 350px;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-}
-
-.modalActions {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-.cancelBtn,
-.deleteBtn {
+.tableOnlyMode .content {
   flex: 1;
-  padding: 8px 15px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
+  width: 100%;
+  padding: 0;
 }
-
-.cancelBtn {
-  background: #f3f4f6;
+.tableOnlyMode .mobileOpenBtn {
+  display: none;
 }
-
-.cancelBtn:hover {
-  background: #e5e7eb;
-}
-
-.deleteBtn {
-  background: #ef4444;
-  color: white;
-}
-
-.deleteBtn:hover {
-  background: #dc2626;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
 @media (max-width: 768px) {
-  .adminLayout {
-    flex-direction: column;
-  }
 
   .sidebar {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  .mobileOpenBtn {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 1100;
   }
 
   .content {
-    padding: 20px;
+    padding: 10px;
+    padding-top: 26px;
   }
 }
