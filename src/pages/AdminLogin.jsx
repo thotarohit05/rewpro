@@ -1,51 +1,78 @@
-// import { useState } from "react";
-// import { supabase } from "../supabaseClient";
-// import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
+import "../styles/adminLogin.css";
+import logo from "../assets/logo.png";
 
-// const AdminLogin = () => {
-//   const navigate = useNavigate();
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
+const AdminLogin = () => {
+  const navigate = useNavigate();
 
-//   const handleLogin = async (e) => {
-//     e.preventDefault();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-//     const { error } = await supabase.auth.signInWithPassword({
-//       email,
-//       password,
-//     });
 
-//     if (error) {
-//       alert("Invalid credentials");
-//       return;
-//     }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
 
-//     navigate("/admin");
-//   };
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-//   return (
-//     <div style={{ padding: "140px" }}>
-//       <h2>Admin Login</h2>
+    setLoading(false);
 
-//       <form onSubmit={handleLogin}>
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           required
-//           onChange={(e) => setEmail(e.target.value)}
-//         />
+    if (error) {
+      setErrorMsg("Invalid email or password");
+      return;
+    }
 
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           required
-//           onChange={(e) => setPassword(e.target.value)}
-//         />
+    navigate("/admin", { replace: true });
+  };
+  return (
+    <div className="adminWrapper">
+      <div className="adminLeft">
+        <img src={logo} alt="Company Logo" className="adminLogo" />
+      </div>
 
-//         <button type="submit">Login</button>
-//       </form>
-//     </div>
-//   );
-// };
+      <div className="adminRight">
+        <div className="adminLoginBox">
+          <h2>Admin Login</h2>
 
-// export default AdminLogin;
+          <form onSubmit={handleLogin}>
+            <div className="inputGroup">
+              <input
+                type="email"
+                placeholder="Enter Email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="inputGroup">
+              <input
+                type="password"
+                placeholder="Enter Password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {errorMsg && <p className="errorText">{errorMsg}</p>}
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLogin;

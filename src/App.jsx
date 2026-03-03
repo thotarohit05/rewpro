@@ -1,5 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
+import WhatsAppSupport from "./components/WhatsAppSupport";
+
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
 import BookService from "./pages/BookService";
@@ -8,13 +11,19 @@ import About from "./pages/About";
 import DealerScreen from "./components/DealerScreen";
 import OurBrands from "./pages/OurBrands";
 import Product from "./pages/Product";
-import Footer from "./components/Footer";
-import WhatsAppSupport from "./components/WhatsAppSupport";
+
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <Header />
+      {!isAdminRoute && <Header />}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/contact-us" element={<Contact />} />
@@ -25,9 +34,21 @@ function App() {
         <Route path="/mission-vision" element={<MissionVision />} />
         <Route path="/become-dealer" element={<DealerScreen type="dealer" />} />
         <Route path="/become-distributor" element={<DealerScreen type="distributor" />} />
+
+        <Route path="/admin-login" element={<AdminLogin />} />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-      <Footer />
-      <WhatsAppSupport /> 
+
+      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <WhatsAppSupport />}
     </>
   );
 }

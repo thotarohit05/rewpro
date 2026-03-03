@@ -1,173 +1,257 @@
-// import { useEffect, useState } from "react";
-// import { supabase } from "../supabaseClient";
-// import { FaUsers, FaPowerOff  } from "react-icons/fa";
-// import { TiExport } from "react-icons/ti";
-// import { CgTrash } from "react-icons/cg";
-// import "../styles/admin.css";
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { FaUsers, FaPowerOff } from "react-icons/fa";
+import { TiExport } from "react-icons/ti";
+import { CgTrash } from "react-icons/cg";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/admin.css";
 
-// const AdminDashboard = () => {
-//   const [activeTab, setActiveTab] = useState("dealer");
-//   const [data, setData] = useState([]);
-//   const [lastLogin, setLastLogin] = useState("");
+const PAGE_SIZE = 5;
+const HIDDEN_COLUMNS = ["id", "is_deleted", "created_at"];
 
-//   const getTableName = () => {
-//     if (activeTab === "dealer") return "dealer_requests";
-//     if (activeTab === "distributor") return "distributor_requests";
-//     return "service_bookings";
-//   };
+const AdminDashboard = () => {
+  const navigate = useNavigate();
 
-//   /* ================= AUTH + LAST LOGIN ================= */
-//   useEffect(() => {
-//     const checkUser = async () => {
-//       const { data: userData } = await supabase.auth.getUser();
+  const [activeTab, setActiveTab] = useState("dealer");
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [lastLogin, setLastLogin] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
-//       if (!userData.user) {
-//         window.location.href = "/admin-login";
-//         return;
-//       }
+  const getTableName = () =>
+    activeTab === "dealer"
+      ? "dealer_requests"
+      : activeTab === "distributor"
+      ? "distributor_requests"
+      : "service_bookings";
 
-//       setLastLogin(userData.user.last_sign_in_at);
-//     };
+  useEffect(() => {
+    fetchData();
+  }, [activeTab, page]);
 
-//     checkUser();
-//   }, []);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) setLastLogin(data.user.last_sign_in_at);
+    });
+  }, []);
 
-//   /* ================= FETCH DATA ================= */
-//   useEffect(() => {
-//     fetchData();
-//   }, [activeTab]);
+  const fetchData = async () => {
+    setLoading(true);
 
-//   const fetchData = async () => {
-//     const { data } = await supabase
-//       .from(getTableName())
-//       .select("*")
-//       .eq("is_deleted", false)
-//       .order("created_at", { ascending: false });
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
 
-//     setData(data || []);
-//   };
+    const { data, count, error } = await supabase
+      .from(getTableName())
+      .select("*", { count: "exact" })
+      .eq("is_deleted", false)
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
-//   /* ================= SOFT DELETE ================= */
-//   const softDelete = async (id) => {
-//     await supabase
-//       .from(getTableName())
-//       .update({ is_deleted: true })
-//       .eq("id", id);
+    if (error) {
+      toast.error("Failed to fetch data ❌");
+    } else {
+      setData(data || []);
+      setTotalCount(count || 0);
+    }
 
-//     fetchData();
-//   };
+    setLoading(false);
+  };
 
-//   /* ================= EXPORT ================= */
-//   const exportData = () => {
-//     if (data.length === 0) return;
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setShowPopup(true);
+  };
 
-//     const headers = Object.keys(data[0]);
-//     const rows = data.map((row) =>
-//       headers.map((header) => `"${row[header] ?? ""}"`).join(",")
-//     );
+  const softDelete = async () => {
+    const { error } = await supabase
+      .from(getTableName())
+      .update({ is_deleted: true })
+      .eq("id", deleteId);
 
-//     const csv = [headers.join(","), ...rows].join("\n");
+    if (error) {
+      toast.error("Delete failed ❌");
+    } else {
+      setData((prev) => prev.filter((item) => item.id !== deleteId));
+      setTotalCount((prev) => prev - 1);
+      toast.success("Successfully deleted ✅");
+    }
 
-//     const blob = new Blob([csv], { type: "text/csv" });
-//     const link = document.createElement("a");
-//     link.href = URL.createObjectURL(blob);
-//     link.download = `${activeTab}.csv`;
-//     link.click();
-//   };
+    setShowPopup(false);
+    setDeleteId(null);
+  };
 
-//   return (
-//     <div className="adminLayout">
+  const exportData = () => {
+    if (!data.length) return toast.error("No data to export ❌");
 
-//       {/* ===== Sidebar ===== */}
-//       <div className="sidebar">
-//         <h3>Admin Panel</h3>
+    const headers = Object.keys(data[0]).filter(
+      (key) => !HIDDEN_COLUMNS.includes(key)
+    );
 
-//         <button
-//           className={activeTab === "dealer" ? "active" : ""}
-//           onClick={() => setActiveTab("dealer")}
-//         >
-//           Dealer
-//         </button>
+    const csv = [
+      headers.join(","),
+      ...data.map((row) =>
+        headers.map((h) => `"${row[h] ?? ""}"`).join(",")
+      ),
+    ].join("\n");
 
-//         <button
-//           className={activeTab === "distributor" ? "active" : ""}
-//           onClick={() => setActiveTab("distributor")}
-//         >
-//           Distributor
-//         </button>
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${activeTab}-page-${page}.csv`;
+    link.click();
 
-//         <button
-//           className={activeTab === "service" ? "active" : ""}
-//           onClick={() => setActiveTab("service")}
-//         >
-//           Service
-//         </button>
+    toast.success("Exported successfully ✅");
+  };
 
-//         <button
-//           className="logout"
-//           onClick={async () => {
-//             await supabase.auth.signOut();
-//             window.location.href = "/admin-login";
-//           }}
-//         >
-//           <FaPowerOff  /> Logout
-//         </button>
-//       </div>
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully 👋");
+    navigate("/admin-login", { replace: true });
+  };
 
-//       {/* ===== Main Content ===== */}
-//       <div className="content">
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-//         <div className="topBar">
-//           {/* <h2>{activeTab.toUpperCase()} RECORDS</h2> */}
-//           <p>Last Login: {new Date(lastLogin).toLocaleString()}</p>
-//         </div>
+  return (
+    <div className="adminLayout">
+      <div className="sidebar">
+        <h3>REW</h3>
 
-//         {/* Count Card */}
-//         <div className="countCard">
-//           <FaUsers size={25} />
-//           <div>
-//             <h3>Total Records</h3>
-//             <p>{data.length}</p>
-//           </div>
-//         </div>
+        {["dealer", "distributor", "service"].map((tab) => (
+          <button
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => {
+              setActiveTab(tab);
+              setPage(1);
+            }}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
 
-//         <button className="exportBtn" onClick={exportData}>
-//           <TiExport /> Export
-//         </button>
+        <button className="logout" onClick={handleLogout}>
+          <FaPowerOff className="logoutIcon" />
+          Logout
+        </button>
+      </div>
 
-//         {/* Table */}
-//         <div className="tableWrapper">
-//           <table>
-//             <thead>
-//               <tr>
-//                 {data[0] &&
-//                   Object.keys(data[0]).map((key) => (
-//                     <th key={key}>{key}</th>
-//                   ))}
-//                 <th>Delete</th>
-//               </tr>
-//             </thead>
+      <div className="content">
+        <div className="topBar">
+          <p>
+            Last Login:{" "}
+            {lastLogin && new Date(lastLogin).toLocaleString()}
+          </p>
+        </div>
 
-//             <tbody>
-//               {data.map((row) => (
-//                 <tr key={row.id}>
-//                   {Object.values(row).map((val, i) => (
-//                     <td key={i}>{val?.toString()}</td>
-//                   ))}
-//                   <td>
-//                     <button onClick={() => softDelete(row.id)}>
-//                       <CgTrash  />
-//                     </button>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
+        <div className="countCard">
+          <FaUsers size={22} />
+          <div>
+            <h3>Total Records</h3>
+            <p>{totalCount}</p>
+          </div>
+        </div>
 
-//       </div>
-//     </div>
-//   );
-// };
+        <button className="exportBtn" onClick={exportData}>
+          <TiExport /> Export
+        </button>
 
-// export default AdminDashboard;
+        <div className="tableWrapper">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>SR. NO</th>
+                  {data[0] &&
+                    Object.keys(data[0])
+                      .filter((key) => !HIDDEN_COLUMNS.includes(key))
+                      .map((key) => (
+                        <th key={key}>
+                          {key.replace(/_/g, " ").toUpperCase()}
+                        </th>
+                      ))}
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {!data.length ? (
+                  <tr>
+                    <td colSpan="100%">No records found</td>
+                  </tr>
+                ) : (
+                  data.map((row, index) => (
+                    <tr key={row.id}>
+                      <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
+
+                      {Object.keys(row)
+                        .filter((key) => !HIDDEN_COLUMNS.includes(key))
+                        .map((key) => (
+                          <td key={key}>{row[key]?.toString()}</td>
+                        ))}
+
+                      <td>
+                        <button onClick={() => confirmDelete(row.id)}>
+                          <CgTrash size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="pagination">
+          <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+            Prev
+          </button>
+
+          <span>
+            Page {page} of {totalPages || 1}
+          </span>
+
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      {showPopup && (
+        <div className="modalOverlay">
+          <div className="modalBox">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this record?</p>
+
+            <div className="modalActions">
+              <button
+                onClick={() => setShowPopup(false)}
+                className="cancelBtn"
+              >
+                No
+              </button>
+              <button onClick={softDelete} className="deleteBtn">
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+    </div>
+  );
+};
+
+export default AdminDashboard;

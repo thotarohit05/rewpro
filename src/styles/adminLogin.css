@@ -1,0 +1,99 @@
+.adminWrapper {
+    display: flex;
+    min-height: 100vh;
+    background: #ffffff;
+    /* Full white background */
+}
+
+/* LEFT SIDE */
+.adminLeft {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.adminLogo {
+    width: 220px;
+}
+
+/* RIGHT SIDE */
+.adminRight {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f9fafb;
+    /* light subtle background */
+}
+
+/* LOGIN BOX */
+.adminLoginBox {
+    background: #ffffff;
+    width: 100%;
+    max-width: 380px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.adminLoginBox h2 {
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.inputGroup {
+    margin-bottom: 15px;
+}
+
+.adminLoginBox input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.adminLoginBox input:focus {
+    outline: none;
+    border-color: #F26A21;
+}
+
+.errorText {
+    color: #dc2626;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.adminLoginBox button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #F26A21;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.adminLoginBox button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .adminWrapper {
+        flex-direction: column;
+    }
+
+    .adminLeft {
+        padding: 40px 0;
+    }
+
+    .adminRight {
+        padding: 20px;
+    }
+}

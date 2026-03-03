@@ -1,8 +1,16 @@
 import { FaWhatsapp } from "react-icons/fa";
+import { FiSettings } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import "./Footer.css";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const navigate = useNavigate();
+
+  const handleAdminAccess = () => {
+    sessionStorage.setItem("allowAdminAccess", "true");
+    navigate("/admin-login");
+  };
 
   return (
     <footer className="footer">
@@ -15,6 +23,13 @@ export default function Footer() {
           <span>
             Designed & Developed by <strong>Mr. Rohit</strong>
           </span>
+
+          {/* Settings Icon */}
+          <FiSettings
+  size={18}
+  className="admin-settings-icon"
+  onClick={handleAdminAccess}
+/>
 
           <a
             href="https://wa.me/919182425192?text=Hello%20I%20need%20development%20support"
