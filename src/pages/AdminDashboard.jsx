@@ -35,11 +35,12 @@ const AdminDashboard = () => {
 
   const isTrash = activeTab.startsWith("trash-");
   const baseTab = activeTab.replace("trash-", "");
-  const tableName = tableMap[baseTab];
+  const tableName = tableMap[baseTab] || "dealer_requests";
   const [tableOnly, setTableOnly] = useState(false);
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line
   }, [activeTab, page]);
 
   useEffect(() => {
@@ -249,79 +250,74 @@ const AdminDashboard = () => {
               )}
             </button>
           </div>
-
           {loading ? (
             <p>Loading...</p>
+          ) : !data.length ? (
+            <div className="noDataMessage">No records found</div>
           ) : (
             <table>
               <thead>
                 <tr>
                   <th>SR. NO</th>
-                  {data[0] &&
-                    Object.keys(data[0])
-                      .filter((k) => !HIDDEN_COLUMNS.includes(k))
-                      .map((k) => (
-                        <th key={k}>
-                          {k.replace(/_/g, " ").toUpperCase()}
-                        </th>
-                      ))}
+                  {Object.keys(data[0])
+                    .filter((k) => !HIDDEN_COLUMNS.includes(k))
+                    .map((k) => (
+                      <th key={k}>
+                        {k.replace(/_/g, " ").toUpperCase()}
+                      </th>
+                    ))}
                   <th>ACTION</th>
                 </tr>
               </thead>
 
               <tbody>
-                {!data.length ? (
-                  <tr>
-                    <td colSpan="100%">No records found</td>
-                  </tr>
-                ) : (
-                  data.map((row, index) => (
-                    <tr key={row.id}>
-                      <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
+                {data.map((row, index) => (
+                  <tr key={row.id}>
+                    <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
 
-                      {Object.keys(row)
-                        .filter((k) => !HIDDEN_COLUMNS.includes(k))
-                        .map((k) => (
-                          <td key={k}>{row[k]?.toString()}</td>
-                        ))}
+                    {Object.keys(row)
+                      .filter((k) => !HIDDEN_COLUMNS.includes(k))
+                      .map((k) => (
+                        <td key={k}>{row[k]?.toString()}</td>
+                      ))}
 
-                      <td>
-                        <div className="actionButtons">
-                          {isTrash ? (
-                            <>
-                              <button
-                                className="iconBtn restoreBtnIcon"
-                                onClick={() => restoreItem(row.id)}
-                              >
-                                <MdRestore size={18} />
-                              </button>
+                    <td>
+                      <div className="actionButtons">
+                        {isTrash ? (
+                          <>
+                            <button
+                              className="iconBtn restoreBtnIcon"
+                              onClick={() => restoreItem(row.id)}
+                            >
+                              <MdRestore size={18} />
+                            </button>
 
-                              <button
-                                className="iconBtn deleteBtnIcon"
-                                onClick={() => permanentDelete(row.id)}
-                              >
-                                <CgTrash size={18} />
-                              </button>
-                            </>
-                          ) : (
                             <button
                               className="iconBtn deleteBtnIcon"
-                              onClick={() => softDelete(row.id)}
+                              onClick={() => permanentDelete(row.id)}
                             >
                               <CgTrash size={18} />
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                          </>
+                        ) : (
+                          <button
+                            className="iconBtn deleteBtnIcon"
+                            onClick={() => softDelete(row.id)}
+                          >
+                            <CgTrash size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}
+
         </div>
 
-        {!tableOnly && (
+        {!tableOnly && totalCount > 0 && (
           <div className="pagination">
             <button disabled={page === 1} onClick={() => setPage(page - 1)}>
               Prev
