@@ -211,7 +211,6 @@
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 20px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -327,6 +326,7 @@ tr:hover {
 .mobileOpenBtn {
   display: none;
 }
+
 /* =========================
    TABLE FULLSCREEN MODE
 ========================= */
@@ -340,9 +340,40 @@ tr:hover {
   width: 100%;
   padding: 0;
 }
+
 .tableOnlyMode .mobileOpenBtn {
   display: none;
 }
+
+/* =========================
+   EXPAND / COLLAPSE BOX BUTTON
+========================= */
+
+.expandBoxWrapper {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.expandBoxBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.expandBoxBtn:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 768px) {
 
   .sidebar {
@@ -375,4 +406,24 @@ tr:hover {
     padding: 10px;
     padding-top: 26px;
   }
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.activeTabHeader {
+  background: #F26A21;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s ease;
 }

@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { FaUsers, FaPowerOff } from "react-icons/fa";
-import { RiExpandDiagonalSLine } from "react-icons/ri";
-import { IoIosCloseCircle } from "react-icons/io";
 import { TiExport } from "react-icons/ti";
-import { CgTrash } from "react-icons/cg";
+import { CgTrash, CgArrowsExpandUpLeft, CgArrowsExpandDownRight } from "react-icons/cg";
 import { MdRestore } from "react-icons/md";
 import { IoIosArrowDropdown } from "react-icons/io";
 import { TbLayoutSidebarLeftExpand, TbLayoutSidebarRightExpand } from "react-icons/tb";
@@ -38,7 +36,6 @@ const AdminDashboard = () => {
   const isTrash = activeTab.startsWith("trash-");
   const baseTab = activeTab.replace("trash-", "");
   const tableName = tableMap[baseTab];
-  // const [expandTable, setExpandTable] = useState(false);
   const [tableOnly, setTableOnly] = useState(false);
 
   useEffect(() => {
@@ -217,29 +214,42 @@ const AdminDashboard = () => {
                 <p>{totalCount}</p>
               </div>
             </div>
-
             <div className="topActions">
+              <div className="activeTabHeader">
+                {isTrash ? "Trash - " : ""}
+                {baseTab.charAt(0).toUpperCase() + baseTab.slice(1)}
+              </div>
 
               <button className="exportBtn" onClick={exportData}>
                 <TiExport /> Export
               </button>
             </div>
+
           </>
         )}
 
         {/* TABLE */}
         <div className="tableWrapper">
           {/* MOBILE EXPAND BUTTON - ATTACHED TO TABLE */}
-          <button
-            className="mobileExpandBtn"
-            onClick={() => setTableOnly(!tableOnly)}
-          >
-            {tableOnly ? (
-              <IoIosCloseCircle size={20} />
-            ) : (
-              <RiExpandDiagonalSLine size={18} />
-            )}
-          </button>
+          <div className="expandBoxWrapper">
+            <button
+              className="expandBoxBtn"
+              onClick={() => setTableOnly(!tableOnly)}
+            >
+              {tableOnly ? (
+                <>
+                  <CgArrowsExpandDownRight size={18} />
+                  <span>Collapse</span>
+                </>
+              ) : (
+                <>
+                  <CgArrowsExpandUpLeft size={18} />
+                  <span>Expand</span>
+                </>
+              )}
+            </button>
+          </div>
+
           {loading ? (
             <p>Loading...</p>
           ) : (
