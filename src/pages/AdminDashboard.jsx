@@ -32,16 +32,23 @@ const AdminDashboard = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [lastLogin, setLastLogin] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const isTrash = activeTab.startsWith("trash-");
   const baseTab = activeTab.replace("trash-", "");
   const tableName = tableMap[baseTab] || "dealer_requests";
   const [tableOnly, setTableOnly] = useState(false);
+  const [confirmBox, setConfirmBox] = useState({
+    show: false,
+    action: null,
+    id: null,
+    message: ""
+  });
 
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line
-  }, [activeTab, page]);
+  }, [activeTab, page, tableName, searchTerm]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -52,62 +59,130 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
 
-    const from = (page - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
+    try {
+      let query = supabase
+        .from(tableName)
+        .select("*", { count: "exact" })
+        .eq("is_deleted", isTrash)
+        .order("created_at", { ascending: false });
 
-    const { data, count, error } = await supabase
-      .from(tableName)
-      .select("*", { count: "exact" })
-      .eq("is_deleted", isTrash)
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      if (searchTerm === "") {
+        const from = (page - 1) * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+        query = query.range(from, to);
+      }
 
-    if (error) toast.error("Failed to fetch ❌");
-    else {
-      setData(data || []);
+      const { data: result, count, error } = await query;
+
+      if (error) throw error;
+
+      setData(result || []);
       setTotalCount(count || 0);
+
+    } catch {
+      toast.error("Failed to fetch ❌");
     }
 
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
+  };
+  const softDelete = (id) => {
+    setConfirmBox({
+      show: true,
+      action: "softDelete",
+      id,
+      message: "Are you sure you want to move this record to Trash?"
+    });
   };
 
-  const softDelete = async (id) => {
-    await supabase.from(tableName).update({ is_deleted: true }).eq("id", id);
-    toast.success("Moved to Trash 🗑️");
-    fetchData();
+  const restoreItem = (id) => {
+    setConfirmBox({
+      show: true,
+      action: "restore",
+      id,
+      message: "Are you sure you want to restore this record?"
+    });
   };
 
-  const restoreItem = async (id) => {
-    await supabase.from(tableName).update({ is_deleted: false }).eq("id", id);
-    toast.success("Restored ✅");
-    fetchData();
+  const permanentDelete = (id) => {
+    setConfirmBox({
+      show: true,
+      action: "delete",
+      id,
+      message: "Are you sure you want to permanently delete this record?"
+    });
   };
 
-  const permanentDelete = async (id) => {
-    await supabase.from(tableName).delete().eq("id", id);
-    toast.success("Deleted permanently 🚀");
-    fetchData();
+  const handleConfirmAction = async () => {
+    const { action, id } = confirmBox;
+
+    try {
+      if (action === "softDelete") {
+        const { error } = await supabase
+          .from(tableName)
+          .update({ is_deleted: true })
+          .eq("id", id);
+
+        if (error) throw error;
+        toast.success("Moved to Trash 🗑️");
+      }
+
+      if (action === "restore") {
+        const { error } = await supabase
+          .from(tableName)
+          .update({ is_deleted: false })
+          .eq("id", id);
+
+        if (error) throw error;
+        toast.success("Restored ✅");
+      }
+
+      if (action === "delete") {
+        const { error } = await supabase
+          .from(tableName)
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+        toast.success("Deleted permanently 🚀");
+      }
+
+      fetchData();
+    } catch (err) {
+      toast.error("Action failed ❌");
+    }
+
+    setConfirmBox({ show: false, action: null, id: null, message: "" });
   };
 
   const exportData = () => {
-    if (!data.length) return toast.error("No data ❌");
+    if (!filteredData.length) return toast.error("No data ❌");
 
-    const headers = Object.keys(data[0]).filter(
+    const headers = Object.keys(filteredData[0]).filter(
       (key) => !HIDDEN_COLUMNS.includes(key)
     );
 
     const csv = [
       headers.join(","),
-      ...data.map((row) =>
-        headers.map((h) => `"${row[h] ?? ""}"`).join(",")
+      ...filteredData.map((row) =>
+        headers.map((h) => row[h] ?? "").join(",")
       ),
     ].join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
+
+    const url = URL.createObjectURL(blob);
+
+    link.href = url;
     link.download = `${activeTab}-page-${page}.csv`;
+
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
 
     toast.success("Exported ✅");
   };
@@ -117,7 +192,19 @@ const AdminDashboard = () => {
     navigate("/admin-login", { replace: true });
   };
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+  const filteredData = !searchTerm
+    ? data
+    : data.filter((row) =>
+      Object.keys(row)
+        .filter((key) => !HIDDEN_COLUMNS.includes(key))
+        .some((key) =>
+          String(row[key] ?? "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+        )
+    );
 
   return (
     <div className={`adminLayout ${tableOnly ? "tableOnlyMode" : ""}`}>
@@ -161,6 +248,7 @@ const AdminDashboard = () => {
               setPage(1);
               setTrashOpen(false);
               setMobileOpen(false);
+              setSearchTerm("");
             }}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -185,6 +273,7 @@ const AdminDashboard = () => {
                   setActiveTab(`trash-${tab}`);
                   setPage(1);
                   setMobileOpen(false);
+                  setSearchTerm("");
                 }}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -220,7 +309,25 @@ const AdminDashboard = () => {
                 {isTrash ? "Trash - " : ""}
                 {baseTab.charAt(0).toUpperCase() + baseTab.slice(1)}
               </div>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="searchInput"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+              />
 
+              {searchTerm && (
+                <button
+                  className="clearSearchBtn"
+                  onClick={() => setSearchTerm("")}
+                >
+                  Clear
+                </button>
+              )}
               <button className="exportBtn" onClick={exportData}>
                 <TiExport /> Export
               </button>
@@ -251,15 +358,17 @@ const AdminDashboard = () => {
             </button>
           </div>
           {loading ? (
-            <p>Loading...</p>
-          ) : !data.length ? (
-            <div className="noDataMessage">No records found</div>
+            <div className="noDataMessage">Loading...</div>
+          ) : !filteredData.length ? (
+            <div className="noDataMessage">
+              {searchTerm ? "No matching records found 🔍" : "No records available"}
+            </div>
           ) : (
             <table>
               <thead>
                 <tr>
                   <th>SR. NO</th>
-                  {Object.keys(data[0])
+                  {Object.keys(filteredData[0] || {})
                     .filter((k) => !HIDDEN_COLUMNS.includes(k))
                     .map((k) => (
                       <th key={k}>
@@ -271,14 +380,14 @@ const AdminDashboard = () => {
               </thead>
 
               <tbody>
-                {data.map((row, index) => (
+                {filteredData.map((row, index) => (
                   <tr key={row.id}>
                     <td>{(page - 1) * PAGE_SIZE + index + 1}</td>
 
                     {Object.keys(row)
                       .filter((k) => !HIDDEN_COLUMNS.includes(k))
                       .map((k) => (
-                        <td key={k}>{row[k]?.toString()}</td>
+                        <td key={k}>{row[k] ?? "-"}</td>
                       ))}
 
                     <td>
@@ -317,7 +426,7 @@ const AdminDashboard = () => {
 
         </div>
 
-        {!tableOnly && totalCount > 0 && (
+        {!tableOnly && totalCount > 0 && searchTerm === "" && (
           <div className="pagination">
             <button disabled={page === 1} onClick={() => setPage(page - 1)}>
               Prev
@@ -333,10 +442,44 @@ const AdminDashboard = () => {
             </button>
           </div>
         )}
-      </div>
 
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
+      {confirmBox.show && (
+        <div
+          className="confirmOverlay"
+          onClick={() =>
+            setConfirmBox({ show: false, action: null, id: null, message: "" })
+          }
+        >
+          <div
+            className="confirmBox"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p>{confirmBox.message}</p>
+
+            <div className="confirmActions">
+              <button
+                className="cancelBtn"
+                onClick={() =>
+                  setConfirmBox({ show: false, action: null, id: null, message: "" })
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                className="confirmBtn"
+                onClick={handleConfirmAction}
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
