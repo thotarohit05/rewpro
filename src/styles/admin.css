@@ -158,7 +158,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ef4444;
+  color: #EA0038;
   font-size: 14px;
 }
 
@@ -275,7 +275,7 @@ tr:hover {
 
 .deleteBtnIcon {
   background: #fee2e2;
-  color: #ef4444;
+  color: #EA0038;
 }
 
 .deleteBtnIcon:hover {
