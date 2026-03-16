@@ -72,7 +72,7 @@ export default function Footer() {
             {showDev && (
               <div className="dev-info">
                 Developed by <b>Mr.Rohit</b><br />
-                Email: thota.rohit0505@email.com<br />
+                Email: thota.rohit0505@gmail.com<br />
                 Phone: +91 91824 25192
               </div>
             )}
