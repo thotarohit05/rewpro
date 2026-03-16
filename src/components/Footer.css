@@ -1,60 +1,139 @@
 .footer {
   background: #fff;
   border-top: 1px solid #e5e5e5;
-  padding: 18px 0;
+  margin-top: 60px;
+}
+
+/* GRID */
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr auto;
+  gap: 70px;
+  padding: 15px 50px;
+  align-items: flex-start;
+}
+
+.footer-logo img {
+  height: 80px;
+}
+
+/* LINKS */
+
+.footer-col h4 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.footer-col span {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
   font-size: 14px;
-}
-
-.footer-container {
-  max-width: 1400px;
-  margin: auto;
-  padding: 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.footer-left {
   color: #333;
 }
 
-.footer-right {
+.footer-col span:hover {
+  color: #F26A21;
+}
+
+/* SOCIAL */
+
+.footer-social p {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.social-icons {
   display: flex;
-  align-items: center;
   gap: 12px;
-  color: #333;
-  flex-wrap: wrap;
 }
 
-.footer-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #25D366;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.admin-settings-icon {
+.social-icons svg {
+  background: #F26A21;
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 40px;
   cursor: pointer;
   transition: 0.3s;
 }
 
-.admin-settings-icon:hover {
-  transform: rotate(90deg);
+.social-icons svg:hover {
+  transform: scale(1.1);
+}
+
+/* BOTTOM */
+
+.footer-bottom {
+  border-top: 1px solid #ddd;
+  padding: 16px 0;
+}
+
+.footer-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* DEVELOPER */
+
+.dev-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.dev-icon {
+  font-size: 18px;
+  color: #555;
+}
+
+.dev-toggle:hover .dev-icon {
   color: #F26A21;
 }
 
-@media (max-width: 768px) {
-  .footer-container {
-    flex-direction: column;
-    text-align: center;
-    gap: 6px;
+.dev-info {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #444;
+}
+
+/* COPYRIGHT */
+
+.copyright {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-settings-icon {
+  cursor: pointer;
+  color: #555;
+  transition: 0.3s;
+}
+
+.admin-settings-icon:hover {
+  color: #F26A21;
+}
+
+/* MOBILE */
+
+@media (max-width:600px) {
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 15px 20px;
   }
 
-  .footer-left,
-  .footer-right {
-    font-size: 12px;
+  .footer-bottom-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
+
 }
