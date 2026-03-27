@@ -1,8 +1,8 @@
 import "../styles/product.css";
 
 import trolley from "../assets/product/trolley.png";
-import cagewheel from "../assets/product/cagewheels.jpg";
-import cultivator from "../assets/product/cultivator.jpg";
+import cagewheel from "../assets/product/cagewheels.png";
+import cultivator from "../assets/product/cultivator.png";
 import rotavator from "../assets/product/rotavator.png";
 import plough from "../assets/product/MB-Plough.png";
 import baler from "../assets/product/baler.png";
