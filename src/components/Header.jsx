@@ -102,6 +102,7 @@ const Header = () => {
                 <div
   className="dropdownItem" onClick={() => handleNavigate("/our-brands")}>Our Brands</div>
                 <div className="dropdownItem" onClick={() => handleNavigate("/about")}>About Us</div>
+                <div className="dropdownItem" onClick={() => handleNavigate("/infrastructure")}>Infrastructure</div>
                 <div className="dropdownItem" onClick={() => handleNavigate("/mission-vision")}>
                   Mission & Vision</div>
                 <div

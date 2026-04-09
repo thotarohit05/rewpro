@@ -35,7 +35,8 @@ export default function Footer() {
         <div className="footer-col">
           <h4>Support</h4>
           <span onClick={() => navigate("/contact-us")}>Contact Us</span>
-          <span>Sitemap</span>
+          <span onClick={() => navigate("/infrastructure")}>Gallery</span>
+          {/* <span>Sitemap</span> */}
         </div>
 
         <div className="footer-social">

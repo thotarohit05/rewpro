@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useEffect } from "react";
+import Infrastructure from "./pages/Infrastructure";
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -40,7 +41,7 @@ function App() {
         <Route path="/mission-vision" element={<MissionVision />} />
         <Route path="/become-dealer" element={<DealerScreen type="dealer" />} />
         <Route path="/become-distributor" element={<DealerScreen type="distributor" />} />
-
+        <Route path="/infrastructure" element={<Infrastructure type="infrastructure" />} />
         <Route path="/admin-login" element={<AdminLogin />} />
 
         <Route
